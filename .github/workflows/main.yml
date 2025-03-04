@@ -1,0 +1,32 @@
+name: Generate RSS Feed
+
+on:
+  schedule:
+    - cron: "0 * * * *"  # تشغيل كل ساعة
+  workflow_dispatch:  # تشغيل يدوي عند الحاجة
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4 feedgen
+
+      - name: Run script
+        run: python rss.py
+
+      - name: Commit and push RSS feed
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions@github.com"
+          git add arabp2p_feed.xml
+          git commit -m "Update RSS Feed" || echo "No changes to commit"
+          git push
